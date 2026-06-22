@@ -115,6 +115,19 @@ def delete_task(task_id: int) -> Response:
     conn.close()
     return jsonify({"deleted": task_id})
 
+db_initialized = False
+
+@app.before_request
+def initialize_database() -> None:
+    """Initializes the database before the first request is processed."""
+    global db_initialized
+    if not db_initialized:
+        try:
+            init_db()
+            db_initialized = True
+        except Exception as e:
+            app.logger.error(f"Database initialization failed: {e}")
+
 if __name__ == "__main__":
-    init_db()
     app.run(host="0.0.0.0", port=5000)
+
